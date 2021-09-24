@@ -549,3 +549,92 @@ class Arrow(object):
             line_join="mitter",
             opacity=self.opacity,
         )
+
+
+class RoundedRectangle(object):
+    def __init__(
+        self,
+        position,
+        width,
+        height,
+        corner_radius=None,
+        orientation=0.0,
+        line_color="black",
+        line_width=1,
+        line_style="-",
+        line_cap="butt",
+        line_join="mitter",
+        fill_color=None,
+        opacity=1.0,
+    ):
+        self.position = np.array(position)
+        self.width = width
+        self.height = height
+        self.corner_radius = corner_radius
+        self.orientation = orientation
+        self.line_color = line_color
+        self.line_width = line_width
+        self.line_style = line_style
+        self.line_cap = line_cap
+        self.line_join = line_join
+        self.fill_color = fill_color
+        self.opacity = opacity
+
+    def draw(self, surface: cairo.Context):
+
+        surface.save()
+
+        transformation_matrix = transformations.rotate_around_point(
+            math.radians(self.orientation), self.position
+        )
+        surface.transform(transformation_matrix)
+
+        p0 = self.position
+        p1 = p0 + (self.width / 2, self.height / 2 - self.corner_radius)
+        # p2 = p0 + (self.width / 2 - self.corner_radius, self.height / 2)
+        p3 = p0 + (-self.width / 2 + self.corner_radius, self.height / 2)
+        # p4 = p0 + (-self.width / 2, self.height / 2 - self.corner_radius)
+        p5 = p0 + (-self.width / 2, -self.height / 2 + self.corner_radius)
+        # p6 = p0 + (-self.width / 2 + self.corner_radius, -self.height / 2)
+        p7 = p0 + (self.width / 2 - self.corner_radius, -self.height / 2)
+        # p8 = p0 + (self.width / 2, -self.height / 2 + self.corner_radius)
+
+        c1 = p0 + (
+            self.width / 2 - self.corner_radius,
+            self.height / 2 - self.corner_radius,
+        )
+        c2 = p0 + (
+            -self.width / 2 + self.corner_radius,
+            self.height / 2 - self.corner_radius,
+        )
+        c3 = p0 + (
+            -self.width / 2 + self.corner_radius,
+            -self.height / 2 + self.corner_radius,
+        )
+        c4 = p0 + (
+            self.width / 2 - self.corner_radius,
+            -self.height / 2 + self.corner_radius,
+        )
+
+        surface.move_to(*p1)
+        surface.arc(c1[0], c1[1], self.corner_radius, 0, np.pi / 2)
+        surface.line_to(*p3)
+        surface.arc(c2[0], c2[1], self.corner_radius, np.pi / 2, np.pi)
+        surface.line_to(*p5)
+        surface.arc(c3[0], c3[1], self.corner_radius, np.pi, 3 * np.pi / 2)
+        surface.line_to(*p7)
+        surface.arc(c4[0], c4[1], self.corner_radius, 3 * np.pi / 2, 2 * np.pi)
+        surface.close_path()
+
+        paint_paths(
+            surface,
+            fill_color=self.fill_color,
+            line_color=self.line_color,
+            line_width=self.line_width,
+            line_style=self.line_style,
+            line_cap=self.line_cap,
+            line_join=self.line_join,
+            opacity=self.opacity,
+        )
+
+        surface.restore()

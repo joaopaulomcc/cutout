@@ -229,6 +229,34 @@ def test_arrow():
     image.write_to_png("tests/images/arrow.png")
 
 
+def test_rounded_rectangle():
+
+    width = 1000
+    height = 1000
+    background_color = "white"
+
+    image, surface = create_image(width, height, background_color)
+
+    rounded_rectangle = cutout.shapes.RoundedRectangle(
+        position=[500, 500],
+        width=700,
+        height=250,
+        corner_radius=57,
+        orientation=25,
+        line_color="firebrick",
+        line_width=3,
+        line_style="-",
+        line_cap="butt",
+        line_join="round",
+        fill_color="gold",
+        opacity=1.0,
+    )
+
+    rounded_rectangle.draw(surface)
+
+    image.write_to_png("tests/images/rounded_rectangle.png")
+
+
 if __name__ == "__main__":
 
     print()
@@ -254,5 +282,8 @@ if __name__ == "__main__":
 
     test_arrow()
     print("- test_arrow()")
+
+    test_rounded_rectangle()
+    print("- test_rounded_rectangle")
 
     print()
